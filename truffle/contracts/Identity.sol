@@ -12,7 +12,7 @@ contract Identity {
 
   struct User {
     string userId;
-    bytes32 userEmail;
+    string userEmail;
   }
 
   modifier isOwner() {
@@ -30,7 +30,7 @@ contract Identity {
     return bytes(userId).length != 0;
   }
 
-  function createUser(string userId, bytes32 userEmail)  returns (bool success) {
+  function createUser(string userId, string userEmail)  returns (bool success) {
     address userAddress = msg.sender;
     if(!userExists(userAddress) && isValidHandle(userId)) {
       Users[userAddress].userId = userId;
@@ -53,7 +53,7 @@ contract Identity {
     return userAddressList;
   }
 
-  function getUser(address userAddress) isOwner constant returns (string, bytes32) {
+  function getUser(address userAddress) isOwner constant returns (string, string) {
     return (Users[userAddress].userId, Users[userAddress].userEmail);
   }
 }
