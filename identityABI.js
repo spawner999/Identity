@@ -1,6 +1,14 @@
 const ABI = [
   {
-    constant: false,
+    constant: true,
+    inputs: [],
+    name: "getUsers",
+    outputs: [{ name: "", type: "bytes32[2][]" }],
+    payable: false,
+    type: "function"
+  },
+  {
+    constant: true,
     inputs: [{ name: "userAddress", type: "address" }],
     name: "userExists",
     outputs: [{ name: "success", type: "bool" }],
@@ -16,8 +24,8 @@ const ABI = [
     type: "function"
   },
   {
-    constant: false,
-    inputs: [{ name: "userId", type: "string" }],
+    constant: true,
+    inputs: [{ name: "userId", type: "bytes32" }],
     name: "isValidHandle",
     outputs: [{ name: "success", type: "bool" }],
     payable: false,
@@ -27,15 +35,15 @@ const ABI = [
     constant: true,
     inputs: [{ name: "userAddress", type: "address" }],
     name: "getUser",
-    outputs: [{ name: "", type: "string" }, { name: "", type: "string" }],
+    outputs: [{ name: "", type: "bytes32[2]" }],
     payable: false,
     type: "function"
   },
   {
     constant: false,
     inputs: [
-      { name: "userId", type: "string" },
-      { name: "userEmail", type: "string" }
+      { name: "userId", type: "bytes32" },
+      { name: "userEmail", type: "bytes32" }
     ],
     name: "createUser",
     outputs: [{ name: "success", type: "bool" }],
@@ -44,7 +52,7 @@ const ABI = [
   },
   {
     constant: false,
-    inputs: [{ name: "userAddress", type: "address" }],
+    inputs: [],
     name: "removeUser",
     outputs: [{ name: "success", type: "bool" }],
     payable: false,
@@ -52,5 +60,4 @@ const ABI = [
   },
   { inputs: [], payable: true, type: "constructor" }
 ];
-
 module.exports = ABI;

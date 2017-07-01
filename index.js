@@ -3,7 +3,9 @@ const Web3 = require("web3");
 const identityABI = require("./identityABI");
 
 const app = express();
-const IdentityAddress = "0x104af23142d0be240bcf2d09b797fa781190fb09";
+const IdentityAddress = "0x95881d99ed06488e085ce5ed46677a35fdae9a25";
+//getAbi
+// Identity.deployed().then(function(i){return JSON.stringify(i.abi)})
 
 if (typeof web3 !== "undefined") {
   web3 = new Web3(web3.currentProvider);
@@ -15,37 +17,40 @@ const IdentityContract = web3.eth.contract(identityABI).at(IdentityAddress);
 
 const defaultAccount = web3.eth.accounts[3];
 
-IdentityContract.removeUser.estimateGas(
-  "0xd5bef0a7a5eccace5650416d75b0435c9c79d292",
+const userName = web3.fromAscii("Pierpaolo");
+const userEmail = web3.fromAscii("dop@pia.pp");
+
+const toAscii = hex => web3.toAscii(hex).replace(/(?:\u0000)+$/, "");
+const convertUser = user => ({
+  userName: toAscii(user[0]),
+  userEmail: toAscii(user[1])
+});
+const convertUserList = userList => userList.map(user => convertUser(user));
+
+IdentityContract.createUser.estimateGas(
+  userName,
+  userEmail,
   { from: defaultAccount },
   function(err, result) {
     if (err) {
       throw err;
     } else {
       var myGasNum = result;
-      IdentityContract.removeUser.sendTransaction(
-        "0xd5bef0a7a5eccace5650416d75b0435c9c79d292",
+      IdentityContract.createUser.sendTransaction(
+        userName,
+        userEmail,
         { from: defaultAccount, gas: myGasNum },
         function(err, result) {
           if (err) {
             throw err;
           } else {
-            console.log("GuestBook signed! TXID : " + result);
+            const user = IdentityContract.getUser(defaultAccount);
+            const userList = IdentityContract.getUsers();
+            console.log(convertUser(user));
+            console.log(convertUserList(userList));
           }
         }
       );
     }
   }
 );
-
-console.log(IdentityContract.getUserAddressList());
-
-console.log(
-  IdentityContract.getUser("0xd5bef0a7a5eccace5650416d75b0435c9c79d292")
-);
-
-app.get("/", function(req, res) {});
-
-app.listen(3000, function() {
-  console.log("Example app listening on port 3000!");
-});

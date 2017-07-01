@@ -6,54 +6,56 @@ contract Identity {
   }
 
   address contractOwner;
-  mapping ( address => User ) Users;
   address[] userAddressList;
-
+  mapping ( address => User ) userMap;
 
   struct User {
-    string userId;
-    string userEmail;
+    bytes32 userId;
+    bytes32 userEmail;
   }
 
-  modifier isOwner() {
-    if(msg.sender != contractOwner) {
-      throw;
+  function userExists(address userAddress) constant returns (bool success) {
+    return userMap[userAddress].userId > 0;
+  }
+
+  function isValidHandle(bytes32 userId) constant returns (bool success) {
+    return userId > 0;
+  }
+
+  function getUserAddressList() constant returns (address[]){
+    return userAddressList;
+  }
+
+  function getUser(address userAddress) constant returns (bytes32[2]) {
+    return [userMap[userAddress].userId, userMap[userAddress].userEmail];
+  }
+
+  function getUsers() constant returns (bytes32[2][]) {
+    bytes32[2][] memory users = new bytes32[2][](userAddressList.length);
+    for(uint i=0; i < userAddressList.length; i ++) {
+      users[i][0] = userMap[userAddressList[i]].userId;
+      users[i][1] = userMap[userAddressList[i]].userEmail;
     }
-    _; //this is replaced by the function body
+    return users;
   }
 
-  function userExists(address userAddress) returns (bool success) {
-    return bytes(Users[userAddress].userId).length != 0;
-  }
-
-  function isValidHandle(string userId) returns (bool success) {
-    return bytes(userId).length != 0;
-  }
-
-  function createUser(string userId, string userEmail)  returns (bool success) {
+  function createUser(bytes32 userId, bytes32 userEmail)  returns (bool success) {
     address userAddress = msg.sender;
     if(!userExists(userAddress) && isValidHandle(userId)) {
-      Users[userAddress].userId = userId;
-      Users[userAddress].userEmail = userEmail;
+      userMap[userAddress].userId = userId;
+      userMap[userAddress].userEmail = userEmail;
       userAddressList.push(userAddress);
       return true;
     }
     return false;
   }
 
-  function removeUser(address userAddress) isOwner returns (bool success) {
+  function removeUser() returns (bool success) {
+    address userAddress = msg.sender;
     if(userExists(userAddress)) {
-      delete Users[userAddress];
+      delete userMap[userAddress];
       return true;
     }
     return false;
-  }
-
-  function getUserAddressList() isOwner constant returns (address[]){
-    return userAddressList;
-  }
-
-  function getUser(address userAddress) isOwner constant returns (string, string) {
-    return (Users[userAddress].userId, Users[userAddress].userEmail);
   }
 }
